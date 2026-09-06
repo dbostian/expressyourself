@@ -39,6 +39,11 @@ Future notes:
 * I'd like to add a one-shot mode in the future.
 * I think it would be nice if the exps paused while holding down a foot switch, resuming when you let up.
 
+![schematic](https://github.com/dbostian/expressyourself/blob/main/artwork/schematic.jpg)
+![pcbs](https://github.com/dbostian/expressyourself/blob/main/artwork/exp5.jpg)
+![soldered componentst](https://github.com/dbostian/expressyourself/blob/main/artwork/exp6.jpg)
+![3d printed enclosure testing](https://github.com/dbostian/expressyourself/blob/main/artwork/exp7.jpg)
+
 ## build notes
 
 The expressionx3.csv contains a fairly complete parts list. Pay attention to the csv, not what is in KiCad.
