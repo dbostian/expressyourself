@@ -34,12 +34,27 @@ Changing the **sync** switch without holding a footswitch down will turn off the
 
 If you change the **shape** switch while holding a foot switch, you will enter **random** mode - each time the wave completes a cycle, random values for **a** and **b** will be chosen, using values between the original **a** and **b**.
 
-Future notes:
+Future features and code changes:
 * I may change triangle to saw in a future update. In practice, triangle and sine waves are very similar.
 * I'd like to add a one-shot mode in the future.
 * I think it would be nice if the exps paused while holding down a foot switch, resuming when you let up.
 
 ![schematic](https://github.com/dbostian/expressyourself/blob/main/artwork/schematic.jpg)
+
+## design notes
+
+The schematic and pcb were layed out in KiCad 10.
+
+This circuit uses every IO pin available on the Arduino Pro Micro. To reduce the number of pins used for the switches (many of which have three positions), I used a key matrix with diodes arranged in a 4 x 5 grid. This reduced the pins needed to 9. This is very similar to how a computer keyboard works. For each three-way switch, I can check two positions, and if neither is "pressed," I can tell that it is in the middle position. I'm using the Adafruit_Keypad library for this. They switch matrix handles all of the toggle switches and the momentaries (tap tempo, plus the foot switches). For more information on how a key matrix works (and why this pedal needs so many diodes), check out this article: https://www.dribin.org/dave/keyboard/one_html/
+
+The digipots are controlled using a software SPI. In using every pin available, I ended up using the MISO pin as one of the CS lines. The built in SPI library conflicted with that use case, hence the bit-banging solution.
+
+The artwork is based on a photo of a cloud that I took, converted to halftones. This is color shifted using a CMYK color scheme for the three expression units. I created the art in InkScape.
+
+The 3d print files were for testing hole location, prior to drilling into metal. I've included them for reference. These were designed in Autodesk Fusion.
+
+The code was written in the Arduino IDE. AI use in this project is limited to GitHub copilot commit messages from editing this README file - not for code generation, pcb design, art, or anything else. It certainly didn't help with soldering.
+
 ![pcbs](https://github.com/dbostian/expressyourself/blob/main/artwork/exp5.jpg)
 ![soldered componentst](https://github.com/dbostian/expressyourself/blob/main/artwork/exp6.jpg)
 ![3d printed enclosure testing](https://github.com/dbostian/expressyourself/blob/main/artwork/exp7.jpg)
