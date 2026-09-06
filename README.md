@@ -8,10 +8,11 @@ This project is work in progress, and is released in an as-is basis. This reposi
 
 I am not planning to release detailed build instructions, but if you're a steady hand at soldering, have built a few diy pedals before, ordered custom pcbs, sourced a bom, and have flashed an arduino or two, you should be able to hanlde this.
 
+Overview Video: https://www.youtube.com/watch?v=8aHI_HfOTI8
 
 ## basic usage
 
-The pedal has three sets of expression controls, arranged in columns from left to right. For any exp, you can set the wave **shape** (triangle, square or sine), an **a** value and a **b** value, and a **rate**. The exp will oscillate between **a** and **b** at the **rate** you set, using the selected **shape**. All knob settings are relative - pay attention to the LED's brightness, as it reflects the actual value.
+The pedal has three sets of expression controls, arranged in columns from left to right. For any exp, you can set the wave **shape** (triangle, square or sine), an **a** value and a **b** value, and a **rate**. The exp will oscillate between **a** and **b** at the **rate** you set, using the selected **shape**. All knob settings are relative - the knob may not match the value when changing the **set** switch, so turning the knob will raise or lower the value accordingly. Pay attention to the LED's brightness, as it reflects the actual value.
 
 Exp 1 can also have its **rate** determined by tap tempo. At most, the last five taps will be used.
 
@@ -21,7 +22,7 @@ To enable an exp's jack, tap the footswitch to enable it. The LED will turn whit
 * Oscillating if the set switch is on **rate** and the exp is **on**
 * A if the set switch is on **rate** and the exp is **off**
 
-You can sync exp2 and exp3 the exp to their left. If **sync** is set to **rate**, the **rate** value will be copied over. If set to **all**, the **a** and **b** values will be copied as well. When syncing (**rate** or **all**), changing the **rate** value will adjust the local **rate** in multiples of the exp to the left - 1/8, 1/4, 1/2, 1x, 2x, 3x, or 4x.
+You can sync exp2 and exp3 the exp to their left. If **sync** is set to **rate**, the **rate** value will be copied over. If set to **all**, the **a** and **b** values will be copied as well. When syncing (**rate** or **all**), changing the **rate** value will adjust the local rate in multiples of the exp to the left - 1/8, 1/4, 1/2, 1x, 2x, 3x, or 4x.
 
 If you hold down any footswitch while changing the **sync** switch, the exp will enter **mod** mode. The output of the exp to the left will control an aspect of this exp. as follows:
 * In **amp** mode, the amplitude of the wave will be changed by the output of the exp to the left. **a** and **b** will move apart or closer together about their middpoint. 0% touching, 50% original values, 100% twice as far apart.
@@ -41,9 +42,9 @@ Future notes:
 
 The expressionx3.csv contains a fairly complete parts list as dumped from KiCad, but note the following changes:
 
-* JST connectors did not fit, just use pin header.
-* You will also need: a 125b enclosure, three momentary foot switches, some 3 pin dupont connectors (if you want to make it easier to disassemble), six computer jumpers (for setting jack connection mode), a power connector, and three TRS jacks (this kind: https://stompboxparts.com/audio-jacks/1-4-trs-enclosed-jack-panel-mount-skinny-lug/)
-* The is challenging to solder, as I completely disregarded courtyards during design. Plan ahead while soldering.
+* JST connectors did not fit - ignore bom and just use pin header.
+* You will also need: a 125b enclosure, three momentary foot switches, three 8-dip sockets for the digipots, some 3 pin dupont connectors (if you want to make it easier to disassemble), six computer jumpers (for setting jack connection mode), a 5.5mm x 2.1mm power connector, and three TRS jacks (this kind: https://stompboxparts.com/audio-jacks/1-4-trs-enclosed-jack-panel-mount-skinny-lug/ - three 1/4" jacks in the top of a 125b is a tight squeeze)
+* The pcb is challenging to solder, as I completely disregarded courtyards during design. Plan ahead while soldering.
 * I installed the pro micro using pin header for clearance. You may want to drill a hole/mill a slot in the side of the enclosure for easy usb cale access, especially if you are planning on experimenting with your own code.
 * You may need to bend some terminals during assembly to get everything to fit inside. I needed this for the foot switches.
 * You might need to use other sized digipots from the MCP41xx series (bigger/smaller than 50k), depending on what you are plugging them into.
