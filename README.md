@@ -9,6 +9,7 @@ This project is work in progress, and is released on an as-is basis. This reposi
 I am not planning to release detailed build instructions, but if you're a steady hand at soldering, have built a few diy pedals before, ordered custom pcbs, sourced a bom, and have flashed an arduino or two, you should be able to handle this.
 
 Overview Video: https://www.youtube.com/watch?v=8aHI_HfOTI8
+Followup Video: https://www.youtube.com/watch?v=umGa9XkKtoM
 
 ## basic usage
 
