@@ -41,7 +41,7 @@ Future notes:
 
 ## build notes
 
-The expressionx3.csv contains a fairly complete parts list as dumped from KiCad, but note the following changes:
+The expressionx3.csv contains a fairly complete parts list. Pay attention to the csv, not what is in KiCad. Paying for assembly probably won't work without some updates.
 
 * JST connectors did not fit - ignore bom and just use pin header.
 * You will also need: a 125b enclosure, three momentary foot switches, three 8-dip sockets for the digipots, some 3 pin dupont connectors (if you want to make it easier to disassemble), six computer jumpers (for setting jack connection mode), a 5.5mm x 2.1mm power connector, and three TRS jacks (this kind: https://stompboxparts.com/audio-jacks/1-4-trs-enclosed-jack-panel-mount-skinny-lug/ - three 1/4" jacks in the top of a 125b is a tight squeeze)
