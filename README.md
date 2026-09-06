@@ -4,9 +4,9 @@
 
 A DIY triple expression pedal. This pedal was heavily inspired by the Old Blood Noise Endeavors Expression Ramper x3. I wanted to add the ability for the pedal to modulate its own values. It has three expression outputs that can sync with each other, and affect each other in weird ways.
 
-This project is work in progress, and is released in an as-is basis. This repository contains all code, artwork (I printed a vinly sticker), pcb schematics, gerbers, a bom, as well as 3d printing files (stls, f3d, step) for a 3d printed enclosure. The pedal will fit in a 125b enclosure. The code is working as described below/shown in the videos, but is in a preliminary stage and may contain bugs. In short, use at your own risk.
+This project is work in progress, and is released on an as-is basis. This repository contains all code, artwork (I printed a vinyl sticker), pcb schematics, gerbers, a bom, as well as 3d printing files (stls, f3d, step) for a 3d printed enclosure. The pedal will fit in a 125b enclosure. The code is working as described below/shown in the videos, but is in a preliminary stage and may contain bugs. In short, use at your own risk.
 
-I am not planning to release detailed build instructions, but if you're a steady hand at soldering, have built a few diy pedals before, ordered custom pcbs, sourced a bom, and have flashed an arduino or two, you should be able to hanlde this.
+I am not planning to release detailed build instructions, but if you're a steady hand at soldering, have built a few diy pedals before, ordered custom pcbs, sourced a bom, and have flashed an arduino or two, you should be able to handle this.
 
 Overview Video: https://www.youtube.com/watch?v=8aHI_HfOTI8
 
@@ -25,7 +25,7 @@ To enable an exp's jack, tap the footswitch to enable it. The LED will turn whit
 You can sync exp2 and exp3 the exp to their left. If **sync** is set to **rate**, the **rate** value will be copied over. If set to **all**, the **a** and **b** values will be copied as well. When syncing (**rate** or **all**), changing the **rate** value will adjust the local rate in multiples of the exp to the left - 1/8, 1/4, 1/2, 1x, 2x, 3x, or 4x.
 
 If you hold down any footswitch while changing the **sync** switch, the exp will enter **mod** mode. The output of the exp to the left will control an aspect of this exp. as follows:
-* In **amp** mode, the amplitude of the wave will be changed by the output of the exp to the left. **a** and **b** will move apart or closer together about their middpoint. 0% touching, 50% original values, 100% twice as far apart.
+* In **amp** mode, the amplitude of the wave will be changed by the output of the exp to the left. **a** and **b** will move apart or closer together about their midpoint. 0% touching, 50% original values, 100% twice as far apart.
 * In **freq** mode, the frequency of the wave will be changed. The **rate** value will be replaced with the output of exp to the left.
 * In **phase** mode, the phase of the wave will be offset by the value of the exp to the left. 0%: minus one wavelength, 50%: no change, 100%: plus one wavelength.
 
