@@ -41,11 +41,11 @@ Future notes:
 
 ## build notes
 
-The expressionx3.csv contains a fairly complete parts list. Pay attention to the csv, not what is in KiCad. Paying for assembly probably won't work without some updates.
+The expressionx3.csv contains a fairly complete parts list. Pay attention to the csv, not what is in KiCad.
 
 * JST connectors did not fit - ignore bom and just use pin header.
-* You will also need: a 125b enclosure, three momentary foot switches, three 8-dip sockets for the digipots, some 3 pin dupont connectors (if you want to make it easier to disassemble), six computer jumpers (for setting jack connection mode), a 5.5mm x 2.1mm power connector, and three TRS jacks (this kind: https://stompboxparts.com/audio-jacks/1-4-trs-enclosed-jack-panel-mount-skinny-lug/ - three 1/4" jacks in the top of a 125b is a tight squeeze)
-* The pcb is challenging to solder, as I completely disregarded courtyards during design. Plan ahead while soldering.
+* TRS jack choice is important. Others did not fit in the enclosure.
+* The pcb is challenging to solder, as I completely disregarded courtyards during design. Plan ahead while soldering. Paying for assembly probably won't work without some updates.
 * I installed the pro micro using pin header for clearance. You may want to drill a hole/mill a slot in the side of the enclosure for easy usb cale access, especially if you are planning on experimenting with your own code.
 * You may need to bend some terminals during assembly to get everything to fit inside. I needed this for the foot switches.
 * You might need to use other sized digipots from the MCP41xx series (bigger/smaller than 50k), depending on what you are plugging them into.
