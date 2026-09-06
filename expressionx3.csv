@@ -1,18 +1,18 @@
-"Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","Datasheet"
-"1N4001","1","1N4001","","","","Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal","http://www.vishay.com/docs/88503/1n4001.pdf"
-"9v1,FS1,FS2,FS3","4","Conn_01x02_Pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
-"C1","1",".33 uF","","","","Capacitor_THT:C_Disc_D10.0mm_W2.5mm_P5.00mm",""
-"C2","1","0.1uF","","","","Capacitor_THT:C_Disc_D10.0mm_W2.5mm_P5.00mm","https://cdn.sparkfun.com/assets/8/a/4/a/5/Kemet_Capacitor_Datasheet.pdf"
-"C3","1","470uF","","","","Capacitor_THT:CP_Radial_D8.0mm_P3.50mm","https://www.nichicon.co.jp/english/series_items/catalog_pdf/e-uud.pdf"
-"D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14,D15,D16,D17,D18,D19,D20","20","1N4148","","","","Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal","https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
-"J1,J3","2","JST_1mm_3","","","","Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical","https://www.jst-mfg.com/product/pdf/eng/eSH.pdf"
-"J1A1,J1B1,J2A1,J2B1,J3A1,J3B1","6","Conn_01x03_Pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",""
-"J2","1","JST_1mm_4","","","","Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical","https://www.jst-mfg.com/product/pdf/eng/eSH.pdf"
-"LED1,LED2,LED3","3","Conn_01x04_Pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",""
-"MCU1","1","ProMicroC","","","","Arduino:Sparkfun_Pro_Micro","https://www.sparkfun.com/products/15795"
-"R1","1","470","","","","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal","https://www.vishay.com/docs/20035/dcrcwe3.pdf"
-"RV1,RV2,RV3","3","R_Potentiometer","","","","Library:Potentiometer_Piher_T-16L_Single_Vertical_Hole",""
-"SW1,SW2,SW3,SW4,SW5,SW6,SW8,SW9","8","Conn_01x03_Pin","","","","Library:SPDT",""
-"SW7","1","Conn_01x02_Pin","","","","Library:SPST",""
-"U1,U2,U3","3","MCP41050","","","","Package_DIP:DIP-8_W7.62mm","http://ww1.microchip.com/downloads/en/DeviceDoc/11195c.pdf"
-"VR1","1","LM7805_TO220","","","","Package_TO_SOT_THT:TO-220-3_Vertical","https://www.onsemi.cn/PowerSolutions/document/MC7800-D.PDF"
+Reference,Qty,Value,Notes,Datasheet / Link
+1N4001,1,1N4001,Chosen over a 1N5817 because of higher voltage drop,http://www.vishay.com/docs/88503/1n4001.pdf
+"9v1,FS1,FS2,FS3",4,Conn_01x02_Pin,,
+C1,1,.33 uF,Ceramic,
+C2,1,0.1uF,Ceramic,https://cdn.sparkfun.com/assets/8/a/4/a/5/Kemet_Capacitor_Datasheet.pdf
+C3,1,470uF,Electrolytic,https://www.nichicon.co.jp/english/series_items/catalog_pdf/e-uud.pdf
+"D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14,D15,D16,D17,D18,D19,D20",20,1N4148,Used for switch matrix,https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf
+"J1,J3",2,JST_1mm_3,Use pin header instead,
+"J1A1,J1B1,J2A1,J2B1,J3A1,J3B1",6,Conn_01x03_Pin,See pcb for jumper arrangement,
+J2,1,JST_1mm_4,Use pin header instead,
+"LED1,LED2,LED3",3,Conn_01x04_Pin,5mm Neopixels,https://www.adafruit.com/product/1938
+MCU1,1,ProMicroC,5v Pro Micro,https://www.sparkfun.com/products/15795
+R1,1,470,,https://www.vishay.com/docs/20035/dcrcwe3.pdf
+"RV1,RV2,RV3",3,R_Potentiometer,16mm B10k,
+"SW1,SW2,SW3,SW4,SW5,SW6,SW8,SW9",8,Conn_01x03_Pin,SPDT on-off-on ,https://stompboxparts.com/switches/spdt-toggle-switch-on-off-on-solder-lug-short-bat/
+SW7,1,Conn_01x02_Pin,Momentary,https://www.sparkfun.com/momentary-button-panel-mount-black.html
+"U1,U2,U3",3,MCP41050,,http://ww1.microchip.com/downloads/en/DeviceDoc/11195c.pdf
+VR1,1,LM7805_TO220,,https://www.onsemi.cn/PowerSolutions/document/MC7800-D.PDF
