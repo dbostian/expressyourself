@@ -16,3 +16,13 @@ R1,1,470,,https://www.vishay.com/docs/20035/dcrcwe3.pdf
 SW7,1,Conn_01x02_Pin,Momentary,https://www.sparkfun.com/momentary-button-panel-mount-black.html
 "U1,U2,U3",3,MCP41050,,http://ww1.microchip.com/downloads/en/DeviceDoc/11195c.pdf
 VR1,1,LM7805_TO220,,https://www.onsemi.cn/PowerSolutions/document/MC7800-D.PDF
+,1,125B,Enclosure,
+,1,5.5 x 2.1 Power,Power jack,
+,3,"1x3 Dupont connectors, F",Connecting output jacks,
+,4,"1x2 Dupont connectors, F",Connecting foot switches and power,
+,6,Jumpers,"Output mode (TRS @ Tip, TRS @ Ring, TS)",
+,3,8 Dip Socket,Removable digipots,
+,2,"01x12 Pin Header, F",Pro Micro Mounting,
+,3,Switch,Momentary Moot Switch,
+,3,Knob,To taste,
+,3,TRS Jack,Skinny panel mount,https://stompboxparts.com/audio-jacks/1-4-trs-enclosed-jack-panel-mount-skinny-lug/
