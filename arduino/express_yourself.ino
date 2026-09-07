@@ -112,6 +112,7 @@ int r[3] = {512, 512, 512}; // rates (wavelength in milliseconds)
 
 int ra[3] = {0, 0, 0}; // randomized a values
 int rb[3] = {0, 0, 0}; // randomized b values
+int rc[3] = {0, 0, 0}; // randomized c values (aka, next a)
 
 unsigned long starts[3] = {0, 0, 0};  // millis value - when an exp was turned on
 unsigned long cyclestarts[3] = {0, 0, 0};  // millis - when an exp's current cycle is started
@@ -395,6 +396,7 @@ void calculateOutputValues() {
   for (int i = 0; i < 3; i++) {
     int aa = a[i];
     int bb = b[i];
+    int cc = a[i];  // c values - usually matching a, except for random mode
     int rr = r[i];
     unsigned long start = cyclestarts[i];
     unsigned long end = cycleends[i];
@@ -462,28 +464,31 @@ void calculateOutputValues() {
     float progress = calcProgress(i);
 
     // past the end of the wavelength - move cyclestart and reset randoms
-    if (now > end) {
+    if (now >= end) {
       cyclestarts[i] = start = getAdjustedStart(start + wavelength, progress, wavelength, i);
       cycleends[i] = end = start + wavelength;
       progress = calcProgress(i); // recalculate progress
 
       //regenerate randoms
-      int randoma = 0;
       int randomb = 0;
+      int randomc = 0;
       if (aa > bb) {
-        randoma = random(bb, aa);  // calculate new random values
-        randomb = random(bb, aa);
+        randomb = random(bb, aa);  // calculate new random values
+        randomc = random(bb, aa);
       } else {
-        randoma = random(aa, bb);  // calculate new random values
-        randomb = random(aa, bb);
+        randomb = random(aa, bb);  // calculate new random values
+        randomc = random(aa, bb);
       }
       
-      if (randoma > randomb) {  // set random vals such that a > b
-        ra[i] = randoma;
+      // move c value to a
+      ra[i] = rc[i];
+
+      if (randomc > randomb) {  // set random vals such that c > b
         rb[i] = randomb;
+        rc[i] = randomc;
       } else {
-        ra[i] = randomb;
-        rb[i] = randoma;
+        rb[i] = randomc;
+        rc[i] = randomb;
       }
     }
 
@@ -520,16 +525,17 @@ void calculateOutputValues() {
     if (randoms[i]) {
       aa = ra[i];
       bb = rb[i];
+      cc = rc[i];
     }
 
     if (waveshape == TRIANGLE) {
-      vals[i] = triangleWave(progress, aa, bb);
+      vals[i] = triangleWave(progress, aa, bb, cc);
     }
     if (waveshape == SQUARE) {
-      vals[i] = squareWave(progress, aa, bb);
+      vals[i] = squareWave(progress, aa, bb, cc);
     }
     if (waveshape == SINE) {
-      vals[i] = sineWave(progress, aa, bb);
+      vals[i] = sineWave(progress, aa, bb, cc);
     }
   }
 
@@ -673,28 +679,32 @@ long calcWavelength(int rate) {
   return constrain(wavelength, RATEMAX, RATEMIN);
 }
 
-// progress = value between 0 and 1, aa = a value, bb = b value
-float sineWave(float progress, int aa, int bb) {
+// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
+float sineWave(float progress, int aa, int bb, int cc) {
   float rads = progress * 2 * PI;
 
-  // cos, as we want to go from a at 0 to b at 50% to a at 100%
-  return mapf(cos(rads), 1.0, -1.0, aa, bb);
+  // cos, as we want to go from a at 0 to b at 50% to c at 100%
+  if (progress <= 0.5) {
+    return mapf(cos(rads), 1.0, -1.0, aa, bb);
+  } else {
+    return mapf(cos(rads), 1.0, -1.0, cc, bb);
+  }
 }
 
-// progress = value between 0 and 1, aa = a value, bb = b value
-float triangleWave(float progress, int aa, int bb) {
+// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
+float triangleWave(float progress, int aa, int bb, int cc) {
   int output = 0;
   if (progress <= 0.5) {
     output = mapf(progress, 0.0, 0.5, aa, bb);
   } else {
-    output = mapf(progress, 0.5, 1.0, bb, aa);
+    output = mapf(progress, 0.5, 1.0, bb, cc);
   }
   
   return constrain(output, 0, 1023);
 }
 
-// progress = value between 0 and 1, aa = a value, bb = b value
-float squareWave(float progress, int aa, int bb) {
+// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
+float squareWave(float progress, int aa, int bb, int cc) {
   if (progress <= 0.5) {
     return aa * 1.0;
   }
