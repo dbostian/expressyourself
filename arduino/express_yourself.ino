@@ -140,11 +140,9 @@ void setup() {
   strip.setBrightness(64);
   strip.show();
 
-  while(!Serial);
+  // while(!Serial);
   // Serial.println("\n\nInitialize Serial Monitor");
   
-
-
 }
 
 void loop() {
@@ -485,16 +483,10 @@ void calculateOutputValues() {
     } 
 
     float progress = calcProgress(start, end);
-    // Serial.print(progress);
-    // Serial.print(",");
-    // Serial.print(start);
-    // Serial.print(",");
-    // Serial.print(end);
-    // Serial.print(",");
-
+    
     progress = progress - (int) progress; // strip to decimal portion only
 
-    if (wavelength != prevwavelength) {
+    if (wavelength != prevwavelength || cyclestarts[i] == 0) {
       start = now - wavelength * progress;
       end = start + wavelength;
     }
@@ -538,7 +530,6 @@ void calculateOutputValues() {
     if (waveshape == SINE) {
       vals[i] = sineWave(progress, aa, bb, cc);
     }
-
   }
 
   // Serial.println("");
