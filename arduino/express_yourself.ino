@@ -19,9 +19,9 @@
 #define SET_RATE  2
 
 
-#define RATEMIN   60000 // 1 bpm (cycle every minute) - slowest rate 
-#define RATEMID   1000  // 60 bpm - when knob is at 12:00
-#define RATEMAX   60    // 1000 bpm (~16.67 beats per second)
+#define RATEMIN   60000L // 1 bpm (cycle every minute) - slowest rate 
+#define RATEMID   1000L  // 60 bpm - when knob is at 12:00
+#define RATEMAX   60L    // 1000 bpm (~16.67 beats per second)
 
 #define DIGIPOTMIN 10     // keep the wiper away from the end to protect against high currents
 #define DIGIPOTMAX 246    // ...both ends. Not sure if either of these is needed, but here to stay on the safe side.
@@ -140,14 +140,24 @@ void setup() {
   strip.setBrightness(64);
   strip.show();
 
-  // while(!Serial);
+  while(!Serial);
   // Serial.println("\n\nInitialize Serial Monitor");
   
+
+
 }
 
 void loop() {
   switches.tick();
-  now = millis();
+  // Not doing anything special for this value overflowing.
+  // It's ulikely anyone would leave their pedal on for a month and a half.
+  // Sorry if bad things happen to you because of this.
+
+  // This is offset by the slowest rate, multiplied by 1/8 and 1/8 
+  // Allows for the start to go back in time. Yes, this does mean the slowest
+  // the third exp can operate is just over an hour per cycle.
+  now = millis() + RATEMIN * 64;
+
 
   readMomentarySwitches();
   readToggleSwitches();
@@ -453,44 +463,34 @@ void calculateOutputValues() {
       }
     }
     
-
     long prevwavelength = cycleends[i] - cyclestarts[i];
-    if (prevwavelength == 0) { prevwavelength = wavelength; } //startup fix
+    if (prevwavelength == 0) { //startup fix
+      prevwavelength = wavelength;
+    } 
+
+    float progress = calcProgress(i);
+    bool nextwave = false;
+    if (progress > 1.0) {
+      progress = progress - (int) progress; // decimal portion
+      nextwave = true;
+    }
 
     if (wavelength != prevwavelength) {
-      cycleends[i] = end = start + wavelength;
+      start = now - wavelength * progress;
+      end = start + wavelength;
     }
-    
-    float progress = calcProgress(i);
 
     // past the end of the wavelength - move cyclestart and reset randoms
-    if (now >= end) {
-      cyclestarts[i] = start = getAdjustedStart(start + wavelength, progress, wavelength, i);
+    if (now > end || nextwave) {
+      start = getAdjustedStart(start + wavelength, progress, wavelength, i);
       cycleends[i] = end = start + wavelength;
-      progress = calcProgress(i); // recalculate progress
+      // progress = calcProgress(i); // recalculate progress
 
-      //regenerate randoms
-      int randomb = 0;
-      int randomc = 0;
-      if (aa > bb) {
-        randomb = random(bb, aa);  // calculate new random values
-        randomc = random(bb, aa);
-      } else {
-        randomb = random(aa, bb);  // calculate new random values
-        randomc = random(aa, bb);
-      }
-      
-      // move c value to a
-      ra[i] = rc[i];
-
-      if (randomc > randomb) {  // set random vals such that c > b
-        rb[i] = randomb;
-        rc[i] = randomc;
-      } else {
-        rb[i] = randomc;
-        rc[i] = randomb;
-      }
+      regenerateRandoms(i, aa, bb);
     }
+
+    cyclestarts[i] = start;
+    cycleends[i] = end;
 
     // amplitude modulation
     // scale a and b about their centerpoint, using output from exp to left
@@ -542,6 +542,29 @@ void calculateOutputValues() {
   // Serial.println("");
 }
 
+void regenerateRandoms(byte i, int aa, int bb) {
+  int randomb = 0;
+  int randomc = 0;
+  if (aa > bb) {
+    randomb = random(bb, aa);  // calculate new random values
+    randomc = random(bb, aa);
+  } else {
+    randomb = random(aa, bb);  // calculate new random values
+    randomc = random(aa, bb);
+  }
+  
+  // move c value to a
+  ra[i] = rc[i];
+
+  if (randomc > randomb) {  // set random vals such that c > b
+    rb[i] = randomb;
+    rc[i] = randomc;
+  } else {
+    rb[i] = randomc;
+    rc[i] = randomb;
+  }
+}
+
 float calcProgress(byte i) {
   long wavelength = cycleends[i] - cyclestarts[i];
   if (wavelength == 0 || now == cyclestarts[i]) {
@@ -549,9 +572,9 @@ float calcProgress(byte i) {
   }
 
   if (now > cyclestarts[i]) {
-    return ((now - cyclestarts[i]) % wavelength) / (wavelength * 1.0);
+    return (now - cyclestarts[i]) / (wavelength * 1.0);
   } else {
-    return 1.0 - ((cyclestarts[i] - now) % wavelength) / (wavelength * 1.0);
+    return (1.0 - (cyclestarts[i] - now)) / (wavelength * 1.0);
   }
 }
 
@@ -671,12 +694,18 @@ void setLeds() {
 long calcWavelength(int rate) {
   long wavelength = 0;
   if (rate >= 0 && rate <= 512) {
-    wavelength = map(rate, 0, 512, RATEMIN, RATEMID);
+    wavelength = map(rate, 0L, 512L, RATEMIN, RATEMID);
+  } else if (rate > 512 && rate <= 1023) {
+    wavelength = map(rate, 512L, 1023L, RATEMID, RATEMAX);
   }
-  if (rate > 512 && rate <= 1023) {
-    wavelength = map(rate, 512, 1023, RATEMID, RATEMAX);
+
+  if (wavelength > RATEMIN) {
+    return RATEMIN;
   }
-  return constrain(wavelength, RATEMAX, RATEMIN);
+  if (wavelength < RATEMAX) {
+    return RATEMAX;
+  }
+  return wavelength;
 }
 
 // progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
