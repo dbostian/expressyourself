@@ -418,6 +418,22 @@ void calculateOutputValues() {
       rr = vals[i-1];
     }
 
+    // amplitude modulation
+    // scale a and b about their centerpoint, using output from exp to left
+    // down = 0x, centered = 1x, up = 2x
+    if (i > 0 && mod[i] == MOD_AMP) {
+      int center = (aa + bb) / 2;
+      float ampfactor = mapf(vals[i-1], 0, 1023, 0.0, 2.0);
+      if (aa > center) {
+        // note ampfactor goes from 0.0 to 2.0, so this can push a and b beyond
+        // their original values
+        int scaleda = mapf(ampfactor, 0.0, 1.0, center, aa);
+        int scaledb = mapf(ampfactor, 0.0, 1.0, center, bb);
+        aa = constrain(scaleda, 0, 1023);
+        bb = constrain(scaledb, 0, 1023);
+      } 
+    }
+
     // sync == all
     float multiplier = 1.0;
     if (syncAll(i)) {
@@ -468,15 +484,15 @@ void calculateOutputValues() {
       prevwavelength = wavelength;
     } 
 
-    float progress = calcProgress(i);
-    bool nextwave = false;
-    if (progress > 1.0) {
-      nextwave = true;
-    }
-    progress = progress - (int) progress; // decimal portion
-    if (progress < 0.0) { // negative fix
-      progress = progress + 1.0;
-    }
+    float progress = calcProgress(start, end);
+    // Serial.print(progress);
+    // Serial.print(",");
+    // Serial.print(start);
+    // Serial.print(",");
+    // Serial.print(end);
+    // Serial.print(",");
+
+    progress = progress - (int) progress; // strip to decimal portion only
 
     if (wavelength != prevwavelength) {
       start = now - wavelength * progress;
@@ -484,31 +500,15 @@ void calculateOutputValues() {
     }
 
     // past the end of the wavelength - move cyclestart and reset randoms
-    if (now > end || nextwave) {
+    if (now >= end) {
       start = getAdjustedStart(start + wavelength, progress, wavelength, i);
-      cycleends[i] = end = start + wavelength;
+      end = start + wavelength;
 
       regenerateRandoms(i, aa, bb);
     }
 
     cyclestarts[i] = start;
     cycleends[i] = end;
-
-    // amplitude modulation
-    // scale a and b about their centerpoint, using output from exp to left
-    // down = 0x, centered = 1x, up = 2x
-    if (i > 0 && mod[i] == MOD_AMP) {
-      int center = (aa + bb) / 2;
-      float ampfactor = mapf(vals[i-1], 0, 1023, 0.0, 2.0);
-      if (aa > center) {
-        // note ampfactor goes from 0.0 to 2.0, so this can push a and b beyond
-        // their original values
-        int scaleda = mapf(ampfactor, 0.0, 1.0, center, aa);
-        int scaledb = mapf(ampfactor, 0.0, 1.0, center, bb);
-        aa = constrain(scaleda, 0, 1023);
-        bb = constrain(scaledb, 0, 1023);
-      } 
-    }
 
     // phase modulation
     // shift progress forward or backward according to val of exp to the left
@@ -523,7 +523,6 @@ void calculateOutputValues() {
       }
     }
     
-    // use random values, if enabled
     if (randoms[i]) {
       aa = ra[i];
       bb = rb[i];
@@ -539,6 +538,7 @@ void calculateOutputValues() {
     if (waveshape == SINE) {
       vals[i] = sineWave(progress, aa, bb, cc);
     }
+
   }
 
   // Serial.println("");
@@ -567,16 +567,16 @@ void regenerateRandoms(byte i, int aa, int bb) {
   }
 }
 
-float calcProgress(byte i) {
-  long wavelength = cycleends[i] - cyclestarts[i];
-  if (wavelength == 0 || now == cyclestarts[i]) {
+float calcProgress(unsigned long start, unsigned long end) {
+  long wavelength = end - start;
+  if (wavelength == 0 || now == start) {
     return 0.0;
   }
 
-  if (now > cyclestarts[i]) {
-    return (now - cyclestarts[i]) / (wavelength * 1.0);
+  if (now > start) {
+    return ((now - start) % wavelength) / (wavelength * 1.0);
   } else {
-    return (1.0 - (cyclestarts[i] - now) % wavelength) / (wavelength * 1.0);
+    return 1.0 - ((start - now) % wavelength) / (wavelength * 1.0);
   }
 }
 
@@ -712,13 +712,13 @@ long calcWavelength(int rate) {
 
 // progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
 float sineWave(float progress, int aa, int bb, int cc) {
-  float rads = progress * 2 * PI;
+  float cosrads = cos(progress * 2 * PI);
 
   // cos, as we want to go from a at 0 to b at 50% to c at 100%
   if (progress <= 0.5) {
-    return mapf(cos(rads), 1.0, -1.0, aa, bb);
+    return mapf(cosrads, 1.0, -1.0, aa, bb);
   } else {
-    return mapf(cos(rads), 1.0, -1.0, cc, bb);
+    return mapf(cosrads, 1.0, -1.0, cc, bb);
   }
 }
 
@@ -728,7 +728,7 @@ float triangleWave(float progress, int aa, int bb, int cc) {
 
   if (progress <= 0.5) {
     output = mapf(progress, 0.0, 0.5, aa, bb);
-  } else if (progress > 0.5 && progress <= 1.0) {
+  } else {
     output = mapf(progress, 0.5, 1.0, bb, cc);
   }
   
