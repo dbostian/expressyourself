@@ -507,7 +507,7 @@ void calculateOutputValues() {
     // phase modulation
     // shift progress forward or backward according to val of exp to the left
     if (i > 0 && mod[i] == MOD_PHASE) {
-      float phasefactor = mapf(vals[i-1], 0, 1023, -1.0, 1.0);
+      float phasefactor = mapf(vals[i-1], 0, 1023, -0.5, 0.5);
       progress = progress + phasefactor;
       if (progress > 1.0) {
         progress = progress - 1.0;
