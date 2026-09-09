@@ -109,6 +109,7 @@ bool oneshot[3] = {0, 0, 0};  // oneshot mode
 int a[3] = {768, 786, 768}; // a values
 int b[3] = {256, 256, 256}; // b values
 int r[3] = {512, 512, 512}; // rates (wavelength in milliseconds)
+float p[3] = {0.0, 0.0, 0.0};
 
 int ra[3] = {0, 0, 0}; // randomized a values
 int rb[3] = {0, 0, 0}; // randomized b values
@@ -492,7 +493,7 @@ void calculateOutputValues() {
     }
 
     // past the end of the wavelength - move cyclestart and reset randoms
-    if (now >= end) {
+    if (progress < p[i]) {
       start = getAdjustedStart(start + wavelength, progress, wavelength, i);
       end = start + wavelength;
 
@@ -501,6 +502,7 @@ void calculateOutputValues() {
 
     cyclestarts[i] = start;
     cycleends[i] = end;
+    p[i] = progress;
 
     // phase modulation
     // shift progress forward or backward according to val of exp to the left
