@@ -471,8 +471,11 @@ void calculateOutputValues() {
     float progress = calcProgress(i);
     bool nextwave = false;
     if (progress > 1.0) {
-      progress = progress - (int) progress; // decimal portion
       nextwave = true;
+    }
+    progress = progress - (int) progress; // decimal portion
+    if (progress < 0.0) { // negative fix
+      progress = progress + 1.0;
     }
 
     if (wavelength != prevwavelength) {
@@ -484,7 +487,6 @@ void calculateOutputValues() {
     if (now > end || nextwave) {
       start = getAdjustedStart(start + wavelength, progress, wavelength, i);
       cycleends[i] = end = start + wavelength;
-      // progress = calcProgress(i); // recalculate progress
 
       regenerateRandoms(i, aa, bb);
     }
@@ -574,7 +576,7 @@ float calcProgress(byte i) {
   if (now > cyclestarts[i]) {
     return (now - cyclestarts[i]) / (wavelength * 1.0);
   } else {
-    return (1.0 - (cyclestarts[i] - now)) / (wavelength * 1.0);
+    return (1.0 - (cyclestarts[i] - now) % wavelength) / (wavelength * 1.0);
   }
 }
 
@@ -723,13 +725,14 @@ float sineWave(float progress, int aa, int bb, int cc) {
 // progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
 float triangleWave(float progress, int aa, int bb, int cc) {
   int output = 0;
+
   if (progress <= 0.5) {
     output = mapf(progress, 0.0, 0.5, aa, bb);
-  } else {
+  } else if (progress > 0.5 && progress <= 1.0) {
     output = mapf(progress, 0.5, 1.0, bb, cc);
   }
   
-  return constrain(output, 0, 1023);
+  return output;
 }
 
 // progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
