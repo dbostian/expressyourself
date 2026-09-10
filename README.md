@@ -40,6 +40,7 @@ If you change the **shape** switch while holding a foot switch, you will enter *
 Future features and code changes:
 * One-shot mode. Holding the tap tempo button while selecting shape will put it into one-shot mode. The EXP will move from A to B when the footswitch is tapped, and back from B to A again when tapped again, and so on.
 * Hold to pause. While a footswitch is held, the exp's output and progress will be paused. It will resume when the footswitch is released.
+* USB Midi?
 
 ![schematic](https://github.com/dbostian/expressyourself/blob/main/artwork/schematic.jpg)
 
@@ -65,6 +66,7 @@ The code was written in the Arduino IDE. AI use in this project is limited to Gi
 
 The expressionx3.csv contains a fairly complete parts list. Pay attention to the csv, not what is in KiCad.
 
+* Knobs are 20mm apart. I used 19mm diameter Davies style knobs.
 * JST connectors did not fit - ignore bom and just use pin header.
 * TRS jack choice is important. Others did not fit in the enclosure.
 * The pcb is challenging to solder, as I completely disregarded courtyards during design. Plan ahead while soldering. Paying for assembly probably won't work without some updates.
