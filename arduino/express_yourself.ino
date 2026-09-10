@@ -111,9 +111,13 @@ int b[3] = {256, 256, 256}; // b values
 int r[3] = {512, 512, 512}; // rates (wavelength in milliseconds)
 float p[3] = {0.0, 0.0, 0.0};
 
-int ra[3] = {0, 0, 0}; // randomized a values
-int rb[3] = {0, 0, 0}; // randomized b values
-int rc[3] = {0, 0, 0}; // randomized c values (aka, next a)
+// random values, a-b-a-b-a-b
+// extends beyond current wavelength, for use when modulating phase
+int rvals[3][6] = {
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0}
+};
 
 unsigned long starts[3] = {0, 0, 0};  // millis value - when an exp was turned on
 unsigned long cyclestarts[3] = {0, 0, 0};  // millis - when an exp's current cycle is started
@@ -140,6 +144,13 @@ void setup() {
   strip.begin();
   strip.setBrightness(64);
   strip.show();
+
+  // initialize randoms array
+  for (int i = 0; i < 3; i++) {
+    regenerateRandoms(i, 768, 256);
+    regenerateRandoms(i, 768, 256);
+    regenerateRandoms(i, 768, 256);
+  }
 
   // while(!Serial);
   // Serial.println("\n\nInitialize Serial Monitor");
@@ -405,7 +416,8 @@ void calculateOutputValues() {
   for (int i = 0; i < 3; i++) {
     int aa = a[i];
     int bb = b[i];
-    int cc = a[i];  // c values - usually matching a, except for random mode
+    int wave[6] = {aa, bb, aa, bb, aa, bb};
+
     int rr = r[i];
     unsigned long start = cyclestarts[i];
     unsigned long end = cycleends[i];
@@ -417,34 +429,24 @@ void calculateOutputValues() {
       rr = vals[i-1];
     }
 
-    // amplitude modulation
-    // scale a and b about their centerpoint, using output from exp to left
-    // down = 0x, centered = 1x, up = 2x
-    if (i > 0 && mod[i] == MOD_AMP) {
-      int center = (aa + bb) / 2;
-      float ampfactor = mapf(vals[i-1], 0, 1023, 0.0, 2.0);
-      if (aa > center) {
-        // note ampfactor goes from 0.0 to 2.0, so this can push a and b beyond
-        // their original values
-        int scaleda = mapf(ampfactor, 0.0, 1.0, center, aa);
-        int scaledb = mapf(ampfactor, 0.0, 1.0, center, bb);
-        aa = constrain(scaleda, 0, 1023);
-        bb = constrain(scaledb, 0, 1023);
-      } 
-    }
-
     // sync == all
     float multiplier = 1.0;
     if (syncAll(i)) {
-      aa = a[i-1];
-      bb = b[i-1];
+      for (int j = 0; j < 6; j += 2) {
+        wave[j] = a[i-1];
+        wave[j+1] = b[i-1];
+      }
+      
       waveshape = shape[i-1];
       if (syncAll(i-1)) {
-        aa = a[i-2];
-        bb = b[i-2];
+        for (int j = 0; j < 6; j += 2) {
+          wave[j] = a[i-2];
+          wave[j+1] = b[i-2];
+        }
         waveshape = shape[i-2];
       }
     }
+
     // sync == all or rate
     if (syncRate(i)) {
       multiplier = rateMultiplier(rr);  // special treatment of rate knob when sync is on
@@ -461,9 +463,6 @@ void calculateOutputValues() {
     }
 
     mults[i] = multiplier;  // update multiplier
-
-    // Serial.print(multiplier);
-    // Serial.print(",");
 
     // unsigned long start = cyclestarts[i];
     long wavelength = calcWavelength(rr) * multiplier;
@@ -506,32 +505,51 @@ void calculateOutputValues() {
 
     // phase modulation
     // shift progress forward or backward according to val of exp to the left
+    // here, progress can below 0.0 and above 1.0
     if (i > 0 && mod[i] == MOD_PHASE) {
       float phasefactor = mapf(vals[i-1], 0, 1023, -0.5, 0.5);
       progress = progress + phasefactor;
-      if (progress > 1.0) {
-        progress = progress - 1.0;
-      }
-      if (progress < 0.0) {
-        progress = progress + 1.0;
-      }
     }
     
     if (randoms[i]) {
-      aa = ra[i];
-      bb = rb[i];
-      cc = rc[i];
+      for (int j = 0; j < 6; j++) {
+        wave[j] = rvals[i][j];
+      }
     }
 
+    // amplitude modulation
+    // scale a and b about their centerpoint, using output from exp to left
+    // down = 0x, centered = 1x, up = 2x
+    if (i > 0 && mod[i] == MOD_AMP) {
+      int center = (aa + bb) / 2;
+      float ampfactor = mapf(vals[i-1], 0, 1023, 0.0, 2.0);
+      if (aa > center) {
+        // note ampfactor goes from 0.0 to 2.0, so this can push a and b beyond
+        // their original values
+        // and beyond the scale of 0-1023
+        for (int j = 0; j < 6; j++) {
+          wave[j] = mapf(ampfactor, 0.0, 1.0, center, wave[j]);
+        }
+      } 
+    }
+
+    // for (int j = 0; j < 6; j++) {
+    //   Serial.print(wave[j]);
+    //   Serial.print(",");
+    // }
+
     if (waveshape == TRIANGLE) {
-      vals[i] = triangleWave(progress, aa, bb, cc);
+      vals[i] = triangleWave(progress, wave);
     }
     if (waveshape == SQUARE) {
-      vals[i] = squareWave(progress, aa, bb, cc);
+      vals[i] = squareWave(progress, wave);
     }
     if (waveshape == SINE) {
-      vals[i] = sineWave(progress, aa, bb, cc);
+      vals[i] = sineWave(progress, wave);
     }
+
+    vals[i] = waveFold(vals[i]);
+
   }
 
   // Serial.println("");
@@ -540,7 +558,7 @@ void calculateOutputValues() {
 void regenerateRandoms(byte i, int aa, int bb) {
   int randomb = 0;
   int randomc = 0;
-  if (aa > bb) {
+  if (aa > b) {
     randomb = random(bb, aa);  // calculate new random values
     randomc = random(bb, aa);
   } else {
@@ -548,15 +566,18 @@ void regenerateRandoms(byte i, int aa, int bb) {
     randomc = random(aa, bb);
   }
   
-  // move c value to a
-  ra[i] = rc[i];
+  // move down
+  rvals[i][0] = rvals[i][2];
+  rvals[i][1] = rvals[i][3];
+  rvals[i][2] = rvals[i][4];
+  rvals[i][3] = rvals[i][5];
 
   if (randomc > randomb) {  // set random vals such that c > b
-    rb[i] = randomb;
-    rc[i] = randomc;
+    rvals[i][4] = randomb;
+    rvals[i][5] = randomc;
   } else {
-    rb[i] = randomc;
-    rc[i] = randomb;
+    rvals[i][4] = randomc;
+    rvals[i][5] = randomb;
   }
 }
 
@@ -611,6 +632,19 @@ unsigned long getAdjustedStart(unsigned long start, float progress, int waveleng
     // offset will always be the same or later
     return parentstart + wavelength * childcyclecount;
   }  
+}
+
+int waveFold(int val) {
+  int folded = val;
+  while (folded < 0 || folded > 1023) {
+    if (folded > 1023) {
+      folded = 1023 - (folded - 1023);
+    }
+    if (folded < 0) {
+      folded = abs(folded);
+    }
+  }
+  return folded;
 }
 
 // is sync set to all?
@@ -703,38 +737,58 @@ long calcWavelength(int rate) {
   return wavelength;
 }
 
-// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
-float sineWave(float progress, int aa, int bb, int cc) {
+// progress = value between -0.5 and 1.5, wave is a series of values a-b-a-b-a-b (or randomized)
+float sineWave(float progress, int wave[]) {
+  // yes, the sine wave is a cosine, as we want to go from a at 0 to b at 50% to c at 100%
   float cosrads = cos(progress * 2 * PI);
 
-  // cos, as we want to go from a at 0 to b at 50% to c at 100%
-  if (progress <= 0.5) {
-    return mapf(cosrads, 1.0, -1.0, aa, bb);
-  } else {
-    return mapf(cosrads, 1.0, -1.0, cc, bb);
-  }
-}
-
-// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
-float triangleWave(float progress, int aa, int bb, int cc) {
   int output = 0;
 
-  if (progress <= 0.5) {
-    output = mapf(progress, 0.0, 0.5, aa, bb);
+  if (progress <= 0.0) {
+    output = mapf(cosrads, -1.0, 1.0, wave[1], wave[2]);
+  } else if (progress <= 0.5) {
+    output = mapf(cosrads, 1.0, -1.0, wave[2], wave[3]);
+  } else if (progress <= 1.0) {
+    output = mapf(cosrads, -1.0, 1.0, wave[3], wave[4]);
   } else {
-    output = mapf(progress, 0.5, 1.0, bb, cc);
+    output = mapf(cosrads, 1.0, -1.0, wave[4], wave[5]);
+  }
+
+  return output;
+}
+
+// progress = value between -0.5 and 1.5, wave is a series of values a-b-a-b-a-b (or randomized)
+float triangleWave(float progress, int wave[]) {
+  int output = 0;
+
+  if (progress <= 0.0) {
+    output = mapf(progress, -0.5, 0.0, wave[1], wave[2]);
+  } else if (progress <= 0.5) {
+    output = mapf(progress, 0.0, 0.5, wave[2], wave[3]);
+  } else if (progress <= 1.0) {
+    output = mapf(progress, 0.5, 1.0, wave[3], wave[4]);
+  } else {
+    output = mapf(progress, 1.0, 1.5, wave[4], wave[5]);
   }
   
   return output;
 }
 
-// progress = value between 0 and 1, aa = a value, bb = b value, cc = next a
-float squareWave(float progress, int aa, int bb, int cc) {
-  if (progress <= 0.5) {
-    return aa * 1.0;
+// progress = value between -0.5 and 1.5, wave is a series of values a-b-a-b-a-b (or randomized)
+float squareWave(float progress, int wave[]) {
+  int output = 0;
+
+  if (progress <= 0.0) {
+    output = wave[1] * 1.0;
+  } else if (progress <= 0.5) {
+    output = wave[2] * 1.0;
+  } else if (progress <= 1.0) {
+    output = wave[3] * 1.0;
+  } else {
+    output = wave[4] * 1.0;
   }
-  
-  return bb * 1.0;
+
+  return output;
 }
 
 
