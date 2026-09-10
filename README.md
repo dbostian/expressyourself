@@ -10,6 +10,7 @@ I am not planning to release detailed build instructions, but if you're a steady
 
 Overview Video: https://www.youtube.com/watch?v=8aHI_HfOTI8
 Followup Video: https://www.youtube.com/watch?v=umGa9XkKtoM
+Part 3: https://www.youtube.com/watch?v=ajVojKqwqVI
 
 ## basic usage
 
@@ -26,18 +27,19 @@ To enable an exp's jack, tap the footswitch to enable it. The LED will turn whit
 You can sync exp2 and exp3 the exp to their left. If **sync** is set to **rate**, the **rate** value will be copied over. If set to **all**, the **a** and **b** values will be copied as well. When syncing (**rate** or **all**), changing the **rate** value will adjust the local rate in multiples of the exp to the left - 1/8, 1/4, 1/2, 1x, 2x, 3x, or 4x.
 
 If you hold down any footswitch while changing the **sync** switch, the exp will enter **mod** mode. The output of the exp to the left will control an aspect of this exp. as follows:
-* In **amp** mode, the amplitude of the wave will be changed by the output of the exp to the left. **a** and **b** will move apart or closer together about their midpoint. 0% touching, 50% original values, 100% twice as far apart.
-* In **freq** mode, the frequency of the wave will be changed. The **rate** value will be replaced with the output of exp to the left.
-* In **phase** mode, the phase of the wave will be offset by the value of the exp to the left. 0%: minus one wavelength, 50%: no change, 100%: plus one wavelength.
+* In **amp** mod mode, the amplitude of the wave will be changed by the output of the exp to the left. **a** and **b** will move apart or closer together about their midpoint. 0% touching, 50% original values, 100% twice as far apart.
+* In **freq** mod mode, the frequency of the wave will be changed. The **rate** value will be replaced with the output of exp to the left.
+* In **phase** mod mode, the phase of the wave will be offset by the value of the exp to the left. 0%: minus one half wavelength, 50%: no change, 100%: plus one half wavelength.
+
+In **amp** mod mode, the value may exceed the maximum or minimum value of the pedal. In this case, **wavefolding** will occur.
 
 Changing the **sync** switch without holding a footswitch down will turn off the **mod** mode. You can have **sync** mode and **mod** mode active at the same time: move the **sync** switch to the desired **sync** mode, hold the foot switch and select the desired **mod** mode. You cannot have more than one **sync** mode or **mod** mode active at the same time.
 
 If you change the **shape** switch while holding a foot switch, you will enter **random** mode - each time the wave completes a cycle, random values for **a** and **b** will be chosen, using values between the original **a** and **b**.
 
 Future features and code changes:
-* I may change triangle to saw in a future update. In practice, triangle and sine waves are very similar.
-* I'd like to add a one-shot mode in the future.
-* I think it would be nice if the exps paused while holding down a foot switch, resuming when you let up.
+* One-shot mode. Holding the tap tempo button while selecting shape will put it into one-shot mode. The EXP will move from A to B when the footswitch is tapped, and back from B to A again when tapped again, and so on.
+* Hold to pause. While a footswitch is held, the exp's output and progress will be paused. It will resume when the footswitch is released.
 
 ![schematic](https://github.com/dbostian/expressyourself/blob/main/artwork/schematic.jpg)
 
